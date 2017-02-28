@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {{ 'test'|trans([], 'admin') }}
+        {{ 'test'|trans}}
+
+        <br>
+
+        {% transchoice 99 %}
+        {0} There are no apples|{1} There is one apple|]1,Inf[ There are %count% apples
+        {% endtranschoice %}
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+    {% stylesheets 'bundles/app/css/*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+    bbbbbbbbbbb
+    {{ asset('bundles/app/css/1.css') }}
+        {% block body %}{% endblock %}
+        {% block javascripts %}
+            {#<script src="{{ asset('bundles/app/js/assets.js') }}"></script>#}
+            {#<script src="{{ asset('bundles/app/js/assets.js', 'avatars') }}"></script>#}
+            {#<script src="/custom/custom.js"></script>#}
+
+            {#{% javascripts '@AppBundle/Resources/public/asseticJs/*' %}#}
+            {#<script src="{{ asset_url }}"></script>#}
+            {#{% endjavascripts %}#}
+        {% endblock %}
+    </body>
+</html>
+
