@@ -62,6 +62,12 @@ You can configure the path, namespace, table_name and name in your ``config.yml`
 Usage
 -----
 
+.. caution::
+
+    If your application is based on Symfony 3, replace ``php app/console`` by
+    ``php bin/console`` before executing any of the console commands included
+    in this article.
+
 All of the migrations functionality is contained in a few console commands:
 
 .. code-block:: bash
@@ -185,9 +191,9 @@ You can skip single migrations by explicitely adding them to the ``migration_ver
 .. code-block:: bash
 
     $ php app/console doctrine:migrations:version YYYYMMDDHHMMSS --add
-    
+
 Doctrine will then assume that this migration has already been run and will ignore it.
-    
+
 
 Generating Migrations Automatically
 -----------------------------------
@@ -289,13 +295,13 @@ to create a fresh database and run your migrations in order to get your database
 schema fully up to date. In fact, this is an easy and dependable workflow
 for your project.
 
-If you don't want to use this workflow and instead create your schema via 
+If you don't want to use this workflow and instead create your schema via
 ``doctrine:schema:create``, you can tell Doctrine to skip all existing migrations:
 
 .. code-block:: bash
 
     $ php app/console doctrine:migrations:version --add --all
-    
+
 Otherwise Doctrine will try to run all migrations, which probably will not work.
 
 Container Aware Migrations
@@ -306,7 +312,7 @@ your data structure. This could be necessary to update relations with some speci
 logic or to create new entities.
 
 Therefore you can just implement the ContainerAwareInterface with its needed methods
-to get full access to the container.
+to get full access to the container or ContainerAwareTrait if you use Symfony >= 2.4.
 
 .. code-block:: php
 
@@ -316,13 +322,37 @@ to get full access to the container.
 
     class Version20130326212938 extends AbstractMigration implements ContainerAwareInterface
     {
-
         private $container;
 
         public function setContainer(ContainerInterface $container = null)
         {
             $this->container = $container;
         }
+
+        public function up(Schema $schema)
+        {
+            // ... migration content
+        }
+
+        public function postUp(Schema $schema)
+        {
+            $converter = $this->container->get('my_service.convert_data_to');
+            // ... convert the data from markdown to html for instance
+        }
+    }
+
+With the trait
+
+.. code-block:: php
+
+    // ...
+    use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
+    use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+    class Version20130326212938 extends AbstractMigration implements ContainerAwareInterface
+    {
+        use ContainerAwareTrait;
 
         public function up(Schema $schema)
         {
